@@ -5,6 +5,7 @@
  */
 package my.ktepin.railroadcrossing.requestgen;
 
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -19,6 +20,7 @@ public class RequestStream{
     private long generateFreq = -1;
     private IRequestGenerateHandler onGenerateHandler;
     
+    private Random rand = new Random(System.currentTimeMillis());
     private Timer timer = new Timer();
    
     //Создание нового потока
@@ -26,7 +28,7 @@ public class RequestStream{
         @Override
         public void run() {
               onTimerGone();
-              timer.schedule(new Task(),5000);
+              timer.schedule(new Task(), getRandomTime());
         }
     }
     
@@ -40,11 +42,19 @@ public class RequestStream{
         this.generatorId = generatorId;
         this.generateFreq = generateFreq;
         this.onGenerateHandler = onGenerateHandler;
-
-        timer.schedule(new Task(),5000);
+        
+        timer.schedule(new Task(), getRandomTime());
     }
     
     private synchronized void onTimerGone(){
         this.onGenerateHandler.onRequestGenerated(this.generatorId);
+    }
+    
+    private long getRandomTime(){
+      
+        boolean isNeg = rand.nextBoolean();
+        long diverse = (long)((rand.nextLong()) % (this.generateFreq * 0.3f));
+        long result = this.generateFreq; 
+        return isNeg ? result-diverse : result+diverse ;
     }
 }

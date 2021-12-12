@@ -23,7 +23,7 @@ public class Main {
         System.out.println("Thread main " + threadId + " ");
         
         RequestStream rs = new RequestStream();
-        rs.startGeneration("Test1", 1000, new IRequestGenerateHandler(){
+        rs.startGeneration("Test1", 5000, new IRequestGenerateHandler(){
             @Override
             public void onRequestGenerated(String generatorId){
                 long threadId = Thread.currentThread().getId();
