@@ -17,13 +17,27 @@ public class Main {
     private static long MODELING_TIME = 10000; //время моделирования (мс) 
     
     public static void main(String args[]) {
-         System.out.println("start");
-         RequestStream rs = new RequestStream();
-         rs.startGeneration("Test1", 1000, new IRequestGenerateHandler(){
-             @Override
-             public void onRequestGenerated(String generatorId){
-                 System.out.println(generatorId);
-             }
-         });
+        
+        
+        long threadId = Thread.currentThread().getId();
+        System.out.println("Thread main " + threadId + " ");
+        
+        RequestStream rs = new RequestStream();
+        rs.startGeneration("Test1", 1000, new IRequestGenerateHandler(){
+            @Override
+            public void onRequestGenerated(String generatorId){
+                long threadId = Thread.currentThread().getId();
+                System.out.println("Thread # " + threadId + " is doing this task");
+            }
+        });
+        
+        RequestStream rs2 = new RequestStream();
+        rs2.startGeneration("Test2", 1000, new IRequestGenerateHandler(){
+            @Override
+            public void onRequestGenerated(String generatorId){
+                long threadId = Thread.currentThread().getId();
+                System.out.println("Thread # " + threadId + " is doing this task");
+            }
+        });
     }
 }

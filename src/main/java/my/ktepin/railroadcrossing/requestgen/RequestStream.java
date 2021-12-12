@@ -13,21 +13,24 @@ import java.util.TimerTask;
  * @author ktepin
  * Генератор заявок - отдельный поток
  */
-public class RequestStream extends Thread {
+public class RequestStream{
     //Миллисекунды - интенсивность потока заявок
     private String generatorId;
     private long generateFreq = -1;
     private IRequestGenerateHandler onGenerateHandler;
     
-    private boolean stopFlag = false;
-    private boolean waitingForTimer = false;
-    
     private Timer timer = new Timer();
-
    
-    public RequestStream(){
-    
+    //Создание нового потока
+    class Task extends TimerTask {
+        @Override
+        public void run() {
+              onTimerGone();
+              timer.schedule(new Task(),5000);
+        }
     }
+    
+    public RequestStream(){}
     
     public synchronized void startGeneration(
             String generatorId,
@@ -37,39 +40,11 @@ public class RequestStream extends Thread {
         this.generatorId = generatorId;
         this.generateFreq = generateFreq;
         this.onGenerateHandler = onGenerateHandler;
-        if(this.generateFreq > 0)
-            this.stopFlag = false;
-        this.start(); //Запуск нового потока
-    }
-    
-    public synchronized void stopGeneration(){
-        this.stopFlag = true;
-    }
-    
-    //Запуск потока
-    @Override
-    public void run(){
-       while(!this.stopFlag){
-           
-            if(!this.waitingForTimer)
-                setTimer(this.generateFreq); //запуск таймера  
-       }
-    }
-    
-    //установка таймера
-    private synchronized void setTimer(long time){
-        this.waitingForTimer = true;
-        TimerTask timerTask = new TimerTask() {      
-            @Override
-            public void run() {
-                onTimerGone(); 
-            }     
-        };
-        this.timer.schedule(timerTask,time);
+
+        timer.schedule(new Task(),5000);
     }
     
     private synchronized void onTimerGone(){
-        this.waitingForTimer = false;
         this.onGenerateHandler.onRequestGenerated(this.generatorId);
     }
 }
